@@ -140,9 +140,9 @@ class JOSIEv4o(nn.Module):
         with torch.no_grad():
             embeddings = self.encoder(inputs)
             video_embeds = embeddings[ModalityType.VISION]  # bsz x 1024
-        inputs_llama = self.input_proj(video_embeds).unsqueeze(1)  # bsz x 1 x llama_size
-        atts_llama = torch.ones(inputs_llama.size()[:-1], dtype=torch.long).to(self.device)  # bsz x 1
-        return inputs_llama, atts_llama
+        input_proj = self.input_proj(video_embeds).unsqueeze(1)  # bsz x 1 x llama_size
+        atts_llama = torch.ones(input_proj.size()[:-1], dtype=torch.long).to(self.device)  # bsz x 1
+        return input_proj, atts_llama
 
     def encode_audio(self, audio_paths):
         inputs = {ModalityType.AUDIO: data.load_and_transform_audio_data(audio_paths, self.device)}
@@ -150,9 +150,9 @@ class JOSIEv4o(nn.Module):
         with torch.no_grad():
             embeddings = self.encoder(inputs)
             audio_embeds = embeddings[ModalityType.AUDIO]  # bsz x 1024
-        inputs_llama = self.input_proj(audio_embeds).unsqueeze(1)  # bsz x 1 x llama_size
-        atts_llama = torch.ones(inputs_llama.size()[:-1], dtype=torch.long).to(self.device)  # bsz x 1
-        return inputs_llama, atts_llama
+        input_proj = self.input_proj(audio_embeds).unsqueeze(1)  # bsz x 1 x llama_size
+        atts_llama = torch.ones(input_proj.size()[:-1], dtype=torch.long).to(self.device)  # bsz x 1
+        return input_proj, atts_llama
 
     def encode_image(self, image_paths):
         inputs = {ModalityType.VISION: data.load_and_transform_vision_data(image_paths, self.device)}
@@ -160,9 +160,9 @@ class JOSIEv4o(nn.Module):
         with torch.no_grad():
             embeddings = self.encoder(inputs)
             image_embeds = embeddings['vision']  # bsz x 1024
-        inputs_llama = self.input_proj(image_embeds).unsqueeze(1)  # bsz x 1 x llama_size
-        atts_llama = torch.ones(inputs_llama.size()[:-1], dtype=torch.long).to(self.device)  # bsz x 1
-        return inputs_llama, atts_llama
+        input_proj = self.input_proj(image_embeds).unsqueeze(1)  # bsz x 1 x llama_size
+        atts_llama = torch.ones(input_proj.size()[:-1], dtype=torch.long).to(self.device)  # bsz x 1
+        return input_proj, atts_llama
 
     def prompt_wrap(self, img_embeds, input_ids, target_ids, attention_mask):
         input_ids = input_ids.to(self.device)
