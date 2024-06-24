@@ -82,7 +82,6 @@ class JOSIEv4o(nn.Module):
         self.resoner_tokenizer = AutoTokenizer.from_pretrained(self.resoner_path)
         self.resoner_tokenizer.pad_token = self.resoner_tokenizer.eos_token
         self.resoner_tokenizer.padding_side = "right"
-        # self.resoner_tokenizer.add_special_tokens({"mask_token": "[MASK]"})
         self._add_image_token()
         self._add_video_token()
         self._add_audio_token()
@@ -98,7 +97,7 @@ class JOSIEv4o(nn.Module):
 
     def _add_image_token(self):
         self.resoner_tokenizer.add_tokens(["<|image_start|>"])
-        self.resoner_tokenizer.add_tokens(["<|image_end|>"])
+        # self.resoner_tokenizer.add_tokens(["<|image_end|>"])
         self.args['gen_img_token_idx'] = []
         for i in range(self.args['num_gen_img_tokens']):
             print(f'Adding <|image_{i}|> token to vocabulary.')
@@ -111,7 +110,7 @@ class JOSIEv4o(nn.Module):
 
     def _add_video_token(self):
         self.resoner_tokenizer.add_tokens({"<|video_start|>"})
-        self.resoner_tokenizer.add_tokens({"<|video_end|>"})
+        # self.resoner_tokenizer.add_tokens({"<|video_end|>"})
         self.args['gen_video_token_idx'] = []
         for i in range(self.args['num_gen_video_tokens']):
             print(f'Adding <|video_{i}|> token to vocabulary.')
@@ -124,7 +123,7 @@ class JOSIEv4o(nn.Module):
 
     def _add_audio_token(self):
         self.resoner_tokenizer.add_tokens({"<|audio_start|>"})
-        self.resoner_tokenizer.add_tokens({"<|audio_end|>"})
+        # self.resoner_tokenizer.add_tokens({"<|audio_end|>"})
         self.args['gen_audio_token_idx'] = []
         for i in range(self.args['num_gen_audio_tokens']):
             print(f'Adding <|audio_{i}|> token to vocabulary.')
@@ -178,7 +177,7 @@ class JOSIEv4o(nn.Module):
             p_after_embeds = self.resoner.model.model.embed_tokens(input_ids).expand(batch_size, -1, -1)  # bsz x s2 x embed_dim
             bos_embeds = self.resoner.model.model.embed_tokens(bos)  # bsz x 1 x embed_dim
         if img_embeds is not None:
-            p_before = '### Human: <|image_start|>'
+            p_before = '\n<|im_start|>user\n<|image_start|>'
             p_before_tokens = self.resoner_tokenizer(p_before, return_tensors="pt", add_special_tokens=False).to(self.device)
             if self.args['freeze_lm']:
                 p_before_embeds = self.resoner.model.embed_tokens(p_before_tokens.input_ids).expand(batch_size, -1, -1)  # bsz x s1 x embed_dim
@@ -192,7 +191,7 @@ class JOSIEv4o(nn.Module):
             attention_mask = torch.cat([atts_prefix, attention_mask], dim=1).to(self.device)
             assert attention_mask.size() == targets.size()  # bsz x (1 + s1 + 1 + s2)
         else:
-            p_before = '### Human: '
+            p_before = '\n<|im_start|>user\n'
             p_before_tokens = self.resoner_tokenizer(p_before, return_tensors="pt", add_special_tokens=False).to(self.device)
             if self.args['freeze_lm']:
                 p_before_embeds = self.resoner.model.embed_tokens(p_before_tokens.input_ids).expand(batch_size, -1, -1)  # bsz x s1 x embed_dim
@@ -211,9 +210,7 @@ class JOSIEv4o(nn.Module):
         if stage == 2:
             input_ids, target_ids, attention_mask = process_batch_stage_2(self.resoner_tokenizer, texts, self.max_length, num_gen_tokens, modality)
         elif stage == 3:
-            input_ids, target_ids, attention_mask = process_batch_stage_3(self.resoner_tokenizer, texts, self.max_length, self.args['num_gen_img_tokens'], self.args['num_gen_video_tokens'],
-                                                                          self.args['num_gen_audio_tokens']
-                                                                          )
+            input_ids, target_ids, attention_mask = process_batch_stage_3(self.resoner_tokenizer, texts, self.max_length, self.args['num_gen_img_tokens'], self.args['num_gen_video_tokens'],self.args['num_gen_audio_tokens'])
         else:
             raise NotImplementedError
         inputs_embeds, targets, attention_mask = self.prompt_wrap(img_embeds, input_ids, target_ids, attention_mask)

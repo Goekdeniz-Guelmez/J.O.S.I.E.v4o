@@ -7,13 +7,6 @@ from tqdm import tqdm
 import torch
 import json
 import pandas as pd
-import argparse
-
-# Load a slightly modified version of the Stable Diffusion pipeline.
-# This allows us to extract text embeddings directly (without generating images).
-from model.custom_sd import StableDiffusionPipeline
-from model.custom_vd import TextToVideoSDPipeline
-from model.custom_ad import AudioLDMPipeline
 
 
 
