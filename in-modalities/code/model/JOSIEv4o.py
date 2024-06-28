@@ -2,7 +2,7 @@ import os.path
 from typing import List
 
 import torch
-from header import *
+from .header import *
 import torch.nn.functional as F
 from .ImageBind import *
 from .ImageBind import data

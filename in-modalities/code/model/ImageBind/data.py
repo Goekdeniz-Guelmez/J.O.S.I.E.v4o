@@ -335,8 +335,8 @@ def load_and_transform_video_data(
             pv_transforms.ShortSideScale(224),
             NormalizeVideo(
                 mean=(0.48145466, 0.4578275, 0.40821073),
-                std=(0.26862954, 0.26130258, 0.27577711),
-            ),
+                std=(0.26862954, 0.26130258, 0.27577711)
+            )
         ]
     )
 
@@ -348,9 +348,8 @@ def load_and_transform_video_data(
     for video_path in video_paths:
         video = EncodedVideo.from_path(
             video_path,
-            decoder="decord",
-            decode_audio=False,
-            # **{"sample_rate": sample_rate},
+            decoder="pyav",
+            decode_audio=False
         )
 
         all_clips_timepoints = get_clip_timepoints(clip_sampler, video.duration)

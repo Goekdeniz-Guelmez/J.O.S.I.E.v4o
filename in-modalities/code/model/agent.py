@@ -80,13 +80,7 @@ class DeepSpeedAgent:
         for k, v in self.ds_engine.module.named_parameters():
             if v.requires_grad:
                 checkpoint[k] = v
-            if 'gen_text_hidden_fcs' in k:
-                checkpoint[k] = v
-            if 'gen_text_hidden_fcs_video' in k:
-                checkpoint[k] = v
-            if 'gen_text_hidden_fcs_audio' in k:
-                checkpoint[k] = v
-            if 'llama_proj' in k:
+            if 'input_proj' in k:
                 checkpoint[k] = v
         torch.save(checkpoint, f'{path}/pytorch_model.pt')
         # save tokenizer
