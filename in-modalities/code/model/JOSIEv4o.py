@@ -268,8 +268,7 @@ class JOSIEv4o(nn.Module):
             else:
                 text_prompt_embeddins = torch.stack(text_prompt_embeddins, dim=0).to(self.device)
                 assert len(text_prompt_embeddins.shape) == 2, text_prompt_embeddins.shape
-                text_prompt_embeddins = text_prompt_embeddins.view(text_prompt_embeddins.size(0), 1,
-                                                                   text_prompt_embeddins.size(1))
+                text_prompt_embeddins = text_prompt_embeddins.view(text_prompt_embeddins.size(0), 1, text_prompt_embeddins.size(1))
                 mse_loss = l2_loss(embeddings, text_prompt_embeddins)
             mse_loss = mse_loss.mean()
             loss += loss_scale * mse_loss
